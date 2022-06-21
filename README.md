@@ -7,4 +7,5 @@ This project uses
 - Text area
 - message box
 - dialog box
-** It tries to immitate Notepad **
+
+**It tries to immitate Notepad**
