@@ -5,6 +5,8 @@ from tkinter.ttk import Labelframe
 from turtle import undo
 
 class realMenu(Menu):
+    counter = 0
+    msg='''This is real's Creation'''
     def __init__(self, master):
         Menu.__init__(self, master)
         fileMenu = Menu(self, tearoff='off')
@@ -24,7 +26,7 @@ class realMenu(Menu):
         editMenu.add_command(label='Cut', command=getCut, compound='right')
         editMenu.add_command(label='Copy', command=getCopy)
         editMenu.add_separator()
-        editMenu.add_command(label='Find', command=getFindEdit)
+        editMenu.add_command(label='Find', command=self.getFindEdit)
         editMenu.add_command(label='Replace', command=getReplaceEdit)
 
         viewMenu = Menu(mainMenu, tearoff='off')
@@ -35,9 +37,116 @@ class realMenu(Menu):
         mainMenu.add_cascade(label='View', menu = helpMenu)
         helpMenu.add_command(label='About', command=getAboutEditor, bitmap="questhead", compound='left')
         helpMenu.add_command(label='Helps', command=getAboutEditor, bitmap="question", compound='left')
+    
+    def getFindEdit(self):
+        self.counter += 1
+        if self.counter > 1:
+            self.msg='''Please you already have find and replace opened.
+            '''
+            showinfo(title='Error', message=self.msg)
+            return
+        rfind = Toplevel(self)
+        # rfind window is the parent window
+        fram = Frame(rfind)
 
+        # Creating Label, Entry Box, Button and packing them adding label tosearch box
+        Label(fram, text ='Find').pack(side = LEFT)
 
+        # adding of single line text box
+        edit = Entry(fram)
 
+        # positioning of text box
+        edit.pack(side = LEFT, fill = BOTH, expand = 1)
+
+        # setting focus
+        edit.focus_set()
+
+        # adding of search button
+        Find = Button(fram, text ='Find')
+        Find.pack(side = LEFT)
+
+        Label(fram, text = "Replace With ").pack(side = LEFT)
+
+        edit2 = Entry(fram)
+        edit2.pack(side = LEFT, fill = BOTH, expand = 1)
+        edit2.focus_set()
+
+        replace = Button(fram, text = 'FindNReplace')
+        replace.pack(side = LEFT)
+
+        fram.pack(side = TOP)
+
+        # function to search string in text
+        def find():
+            
+            # remove tag 'found' from index 1 to END
+            textEditor.tag_remove('found', '1.0', END)
+            
+            # returns to widget currently in focus
+            s = edit.get()
+            
+            if (s):
+                idx = '1.0'
+                while 1:
+                    # searches for desired string from index 1
+                    idx = textEditor.search(s, idx, nocase = 1, stopindex = END)
+                    
+                    if not idx: break
+                    
+                    # last index sum of current index and
+                    # length of text
+                    lastidx = '% s+% dc' % (idx, len(s))
+                    
+
+                    # overwrite 'Found' at idx
+                    textEditor.tag_add('found', idx, lastidx)
+                    idx = lastidx
+
+                    # mark located string as red
+                textEditor.tag_config('found', foreground ='red')
+            edit.focus_set()
+
+        def findNreplace():
+            
+            # remove tag 'found' from index 1 to END
+            textEditor.tag_remove('found', '1.0', END)
+            
+            # returns to widget currently in focus
+            s = edit.get()
+            r = edit2.get()
+            
+            if (s and r):
+                idx = '1.0'
+                while 1:
+                    # searches for desired string from index 1
+                    idx = textEditor.search(s, idx, nocase = 1,
+                                    stopindex = END)
+                    print(idx)
+                    if not idx: break
+                    
+                    # last index sum of current index and
+                    # length of text
+                    lastidx = '% s+% dc' % (idx, len(s))
+
+                    textEditor.delete(idx, lastidx)
+                    textEditor.insert(idx, r)
+
+                    lastidx = '% s+% dc' % (idx, len(r))
+                    
+                    # overwrite 'Found' at idx
+                    textEditor.tag_add('found', idx, lastidx)
+                    idx = lastidx
+
+                # mark located string as red
+                textEditor.tag_config('found', foreground ='green', background = 'yellow')
+            edit.focus_set()
+
+                        
+        Find.config(command = find)
+        replace.config(command = findNreplace)
+
+        # mainloop function calls the endless loop of the window, so the window will
+        # wait for any user interaction till we close it
 
 root = Tk(screenName='Real Text Editor')
 root.wm_title('Real Text Editor')
@@ -118,117 +227,6 @@ def getUndoEdit(event=None):
 def getRedoEdit(event=None):
     textEditor.event_generate(("<Redo>"))
 
-def getFindEdit():
-
-    # to create a window
-    rfind = Tk()
-
-    # rfind window is the parent window
-    fram = Frame(rfind)
-
-    # Creating Label, Entry Box, Button
-    # and packing them adding label to
-    # search box
-    Label(fram, text ='Find').pack(side = LEFT)
-
-    # adding of single line text box
-    edit = Entry(fram)
-
-    # positioning of text box
-    edit.pack(side = LEFT, fill = BOTH, expand = 1)
-
-    # setting focus
-    edit.focus_set()
-
-    # adding of search button
-    Find = Button(fram, text ='Find')
-    Find.pack(side = LEFT)
-
-
-    Label(fram, text = "Replace With ").pack(side = LEFT)
-
-    edit2 = Entry(fram)
-    edit2.pack(side = LEFT, fill = BOTH, expand = 1)
-    edit2.focus_set()
-
-    replace = Button(fram, text = 'FindNReplace')
-    replace.pack(side = LEFT)
-
-    fram.pack(side = TOP)
-
-    # function to search string in text
-    def find():
-        
-        # remove tag 'found' from index 1 to END
-        textEditor.tag_remove('found', '1.0', END)
-        
-        # returns to widget currently in focus
-        s = edit.get()
-        
-        if (s):
-            idx = '1.0'
-            while 1:
-                # searches for desired string from index 1
-                idx = textEditor.search(s, idx, nocase = 1, stopindex = END)
-                
-                if not idx: break
-                
-                # last index sum of current index and
-                # length of text
-                lastidx = '% s+% dc' % (idx, len(s))
-                
-
-                # overwrite 'Found' at idx
-                textEditor.tag_add('found', idx, lastidx)
-                idx = lastidx
-
-                # mark located string as red
-            textEditor.tag_config('found', foreground ='red')
-        edit.focus_set()
-
-    def findNreplace():
-        
-        # remove tag 'found' from index 1 to END
-        textEditor.tag_remove('found', '1.0', END)
-        
-        # returns to widget currently in focus
-        s = edit.get()
-        r = edit2.get()
-        
-        if (s and r):
-            idx = '1.0'
-            while 1:
-                # searches for desired string from index 1
-                idx = textEditor.search(s, idx, nocase = 1,
-                                stopindex = END)
-                print(idx)
-                if not idx: break
-                
-                # last index sum of current index and
-                # length of text
-                lastidx = '% s+% dc' % (idx, len(s))
-
-                textEditor.delete(idx, lastidx)
-                textEditor.insert(idx, r)
-
-                lastidx = '% s+% dc' % (idx, len(r))
-                
-                # overwrite 'Found' at idx
-                textEditor.tag_add('found', idx, lastidx)
-                idx = lastidx
-
-            # mark located string as red
-            textEditor.tag_config('found', foreground ='green', background = 'yellow')
-        edit.focus_set()
-
-                    
-    Find.config(command = find)
-    replace.config(command = findNreplace)
-
-    # mainloop function calls the endless
-    # loop of the window, so the window will
-    # wait for any user interaction till we
-    # close it
 
 
 def getReplaceEdit():
@@ -247,7 +245,7 @@ def getAboutEditor():
     msg='''This is Real Text Editor. Real Text Editor is developed by Real Sanjeev.
     Develop for educational purpose. 
     '''
-    showinfo(title='About Real Text Editor', message=msg.pack())
+    showinfo(title='About Real Text Editor', message=msg)
 
 
 textEditor=Text(editingFrame)
