@@ -1,8 +1,7 @@
 from tkinter import *
 from tkinter.messagebox import showinfo,  askquestion
 from tkinter import filedialog as fd
-from tkinter.filedialog import asksaveasfile, asksaveasfilename
-from tkinter.ttk import Labelframe
+from tkinter.filedialog import asksaveasfilename
 from view import getAboutEditor
 
 root = Tk(screenName='Real Text Editor')
@@ -176,9 +175,15 @@ def getOpenFile():
 
 def getSaveAsFile():
     fileExt= [('All files','*.*'),('Text Document','*.txt')]
-    fileName = fd.asksaveasfile(initialfile='untitled.txt', defaultextension='.txt',filetypes=fileExt)
+    fileName = fd.asksaveasfile(initialfile='untitled.txt', 
+                                    defaultextension='.txt', filetypes=fileExt)
     try:
-        with open(fileName, 'w') as f:
+        print('='*100)
+        contents = textEditor.get(1.0, END)
+        print(contents)
+        print('='*100)
+        print('*'*100)
+        with open(fileName.name, 'w') as f:
             contents = textEditor.get(1.0, END)
             f.write(contents)
 
@@ -265,11 +270,12 @@ textEditor.config(yscrollcommand=yscrollbar.set, state='normal', xscrollcommand=
 lb=Label(labelFrame, text='REALTEXT')
 lb.pack(side='right', expand=1)
 
-root.bind('<Control-s>',getSaveFile)
-root.bind('<Control-S>',getSaveFile)
-root.bind('<Control-x>',getExitFile)
-root.bind('<Control-X>',getExitFile)
+
 
 if __name__=='__main__':
     realMenu(mainMenu)
+    root.bind('<Control-s>',getSaveFile)
+    root.bind('<Control-S>',getSaveFile)
+    root.bind('<Control-x>',getExitFile)
+    root.bind('<Control-X>',getExitFile)
     root.mainloop()
