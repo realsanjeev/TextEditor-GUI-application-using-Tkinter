@@ -1,8 +1,17 @@
 from tkinter import *
-from tkinter.messagebox import showinfo
+from tkinter.messagebox import showinfo,  askquestion
 from tkinter import filedialog as fd
+from tkinter.filedialog import asksaveasfile, asksaveasfilename
 from tkinter.ttk import Labelframe
-from turtle import undo
+from view import getAboutEditor
+
+root = Tk(screenName='Real Text Editor')
+root.wm_title('Real Text Editor')
+root.wm_iconbitmap('editorIcon.ico')
+root.wm_geometry('340x220')
+
+global file
+file = None
 
 class realMenu(Menu):
     counter = 0
@@ -40,12 +49,16 @@ class realMenu(Menu):
     
     def getFindEdit(self):
         self.counter += 1
+
         if self.counter > 1:
             self.msg='''Please you already have find and replace opened.
-            '''
+                '''
             showinfo(title='Error', message=self.msg)
             return
+        # to only open one window for find and replace
+
         rfind = Toplevel(self)
+        rfind.wm_iconbitmap('search.ico')
         # rfind window is the parent window
         fram = Frame(rfind)
 
@@ -71,7 +84,7 @@ class realMenu(Menu):
         edit2.pack(side = LEFT, fill = BOTH, expand = 1)
         edit2.focus_set()
 
-        replace = Button(fram, text = 'FindNReplace')
+        replace = Button(fram, text = 'Replace')
         replace.pack(side = LEFT)
 
         fram.pack(side = TOP)
@@ -145,25 +158,7 @@ class realMenu(Menu):
         Find.config(command = find)
         replace.config(command = findNreplace)
 
-        # mainloop function calls the endless loop of the window, so the window will
-        # wait for any user interaction till we close it
-
-root = Tk(screenName='Real Text Editor')
-root.wm_title('Real Text Editor')
-root.wm_iconbitmap('computer.ico')
-root.wm_geometry('340x220')
-
-editingFrame = Frame(root)
-editingFrame.pack(fill='both', expand=-1)
-
-labelFrame=Frame(root)
-labelFrame.pack(side='bottom')
-
-mainMenu = Menu(root)
-root.config(menu = mainMenu)
-
 def getNewFile():
-    global file
     file = None
     root.title("Untitled - Real Text Editor")
     textEditor.delete(1.0, END)
@@ -175,9 +170,9 @@ def getOpenFile():
     if f is not None:
         content=f.read()
         print(content)
-    textEditor.insert('1.0', content)
-    print(f)
-    root.wm_title(f)
+        textEditor.insert('1.0', content)
+        print(f)
+        root.wm_title(f)
 
 def getSaveAsFile():
     fileExt= [('All files','*.*'),('Text Document','*.txt')]
@@ -201,11 +196,10 @@ def getSaveFile():
 
         else:
             #Save as a new file
-            f = open(file, "w")
-            f.write(TextArea.get(1.0, END))
-            f.close()
+            with open(file, 'w') as f:
+                f.write(TextArea.get(1.0, END))
 
-            root.title(os.path.basename(file) + " - Real Text Editor")
+            root.title(file + " - Real Text Editor")
             print("File Saved")
     else:
         # Save the file
@@ -214,6 +208,11 @@ def getSaveFile():
         f.close()
 
 def getExitFile(event=None):
+    if file is None:
+        option = askquestion(title='Save CURRENT file', message='Save Or Quit')
+        print(option)
+        if option == True:
+            getSaveFile()
     root.destroy()
 
     print('ok')
@@ -227,8 +226,6 @@ def getUndoEdit(event=None):
 def getRedoEdit(event=None):
     textEditor.event_generate(("<Redo>"))
 
-
-
 def getReplaceEdit():
     print('ok')
 
@@ -241,12 +238,17 @@ def getCopy(event=None):
 def getCut(event=None):
     textEditor.event_generate(("<Cut>"))
 
-def getAboutEditor():
-    msg='''This is Real Text Editor. Real Text Editor is developed by Real Sanjeev.
-    Develop for educational purpose. 
-    '''
-    showinfo(title='About Real Text Editor', message=msg)
 
+
+
+editingFrame = Frame(root)
+editingFrame.pack(fill='both', expand=-1)
+
+labelFrame=Frame(root)
+labelFrame.pack(side='bottom')
+
+mainMenu = Menu(root)
+root.config(menu = mainMenu)
 
 textEditor=Text(editingFrame)
 textEditor.pack(fill='both', expand=True)
@@ -260,14 +262,13 @@ xscrollbar.pack(side=BOTTOM, fill='x')
 textEditor.config(yscrollcommand=yscrollbar.set, state='normal', xscrollcommand=xscrollbar.set,
                         undo=True, endline=5)
 
-lb=Label(labelFrame, text='Line no')
+lb=Label(labelFrame, text='REALTEXT')
 lb.pack(side='right', expand=1)
 
 root.bind('<Control-s>',getSaveFile)
 root.bind('<Control-S>',getSaveFile)
 root.bind('<Control-x>',getExitFile)
-root.bind('<Control-Y>',getExitFile)
-root.bind('<Control-A>', getSelectAllView)
+root.bind('<Control-X>',getExitFile)
 
 if __name__=='__main__':
     realMenu(mainMenu)
