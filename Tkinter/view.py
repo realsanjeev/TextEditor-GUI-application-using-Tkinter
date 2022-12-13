@@ -1,6 +1,8 @@
+'''for showing info message box'''
 from tkinter.messagebox import showinfo
 
 def getAboutEditor():
+    '''for displaying msg'''
     msg='''
     This is Real Text Editor. Real Text Editor is developed by Real Sanjeev.
     This project is made using tkinter python GNU Liabiries. Most of program is procedural programing method rather than objet oriented approach. It is easy to understand program
