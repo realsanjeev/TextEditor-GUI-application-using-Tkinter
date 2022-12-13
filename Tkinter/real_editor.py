@@ -1,4 +1,6 @@
-from tkinter import *
+'''importing tkinter different class and method'''
+from tkinter import Tk, Menu, Frame, Button, Toplevel
+from tkinter import Label, Scrollbar, END, LEFT, BOTH, BOTTOM, TOP, RIGHT, Text, Entry
 from tkinter.messagebox import showinfo,  askquestion
 from tkinter import filedialog as fd
 from tkinter.filedialog import asksaveasfilename
@@ -9,45 +11,47 @@ root.wm_title('Real Text Editor')
 root.wm_iconbitmap('editorIcon.ico')
 root.wm_geometry('340x220')
 
-global file
+FILE = None
 
-class realMenu(Menu):
+class RealMenu(Menu):
+    '''Making menu class'''
     counter = 0
     msg='''This is real's Creation'''
     def __init__(self, master):
         Menu.__init__(self, master)
-        fileMenu = Menu(self, tearoff='off')
-        mainMenu.add_cascade(label = 'File', menu = fileMenu)
-        fileMenu.add_command(label = 'New', command=getNewFile)
-        fileMenu.add_command(label='Open', command=getOpenFile)
-        fileMenu.add_separator()
-        fileMenu.add_command(label='Save As', command=getSaveAsFile)
-        fileMenu.add_command(label='Save', command=getSaveFile)
-        fileMenu.add_command(label='Exit', command=getExitFile)
+        file_menu = Menu(self, tearoff='off')
+        mainMenu.add_cascade(label = 'File', menu = file_menu)
+        file_menu.add_command(label = 'New', command=get_new_file)
+        file_menu.add_command(label='Open', command=get_open_file)
+        file_menu.add_separator()
+        file_menu.add_command(label='Save As', command=get_save_as_file)
+        file_menu.add_command(label='Save', command=get_save_file)
+        file_menu.add_command(label='Exit', command=get_exit_file)
 
-        editMenu = Menu(mainMenu, tearoff='off')
-        mainMenu.add_cascade(label='Edit', menu = editMenu)
-        editMenu.add_command(label='Undo', command= getUndoEdit)
-        editMenu.add_command(label='Redo', command= getRedoEdit)
-        editMenu.add_separator()
-        editMenu.add_command(label='Cut', command=getCut, compound='right')
-        editMenu.add_command(label='Copy', command=getCopy)
-        editMenu.add_separator()
-        editMenu.add_command(label='Find', command=self.getFindEdit)
-        editMenu.add_command(label='Replace', command=getReplaceEdit)
+        edit_menu = Menu(mainMenu, tearoff='off')
+        mainMenu.add_cascade(label='Edit', menu = edit_menu)
+        edit_menu.add_command(label='Undo', command= get_undo_edit)
+        edit_menu.add_command(label='Redo', command= get_redo_edit)
+        edit_menu.add_separator()
+        edit_menu.add_command(label='Cut', command=get_cut, compound='right')
+        edit_menu.add_command(label='Copy', command=get_copy)
+        edit_menu.add_separator()
+        edit_menu.add_command(label='Find', command=self.get_find_edit)
+        edit_menu.add_command(label='Replace', command=get_replace_edit)
 
-        viewMenu = Menu(mainMenu, tearoff='off')
-        mainMenu.add_cascade(label='View', menu = viewMenu)
-        viewMenu.add_command(label='Status Bar', command=get)
+        view_menu = Menu(mainMenu, tearoff='off')
+        mainMenu.add_cascade(label='View', menu = view_menu)
+        view_menu.add_command(label='Status Bar', command=get)
 
-        helpMenu = Menu(mainMenu, tearoff='off')
-        mainMenu.add_cascade(label='View', menu = helpMenu)
-        helpMenu.add_command(label='About', command=getAboutEditor, 
+        help_menu = Menu(mainMenu, tearoff='off')
+        mainMenu.add_cascade(label='View', menu = help_menu)
+        help_menu.add_command(label='About', command=getAboutEditor,
                                     bitmap="questhead", compound='left')
-        helpMenu.add_command(label='Helps', command=getAboutEditor, 
+        help_menu.add_command(label='Helps', command=getAboutEditor,
                                     bitmap="question", compound='left')
-    
-    def getFindEdit(self):
+
+    def get_find_edit(self):
+        '''for find edit function'''
         self.counter += 1
 
         if self.counter > 1:
@@ -75,8 +79,8 @@ class realMenu(Menu):
         edit.focus_set()
 
         # adding of search button
-        Find = Button(fram, text ='Find')
-        Find.pack(side = LEFT)
+        find_b = Button(fram, text ='Find')
+        find_b.pack(side = LEFT)
 
         Label(fram, text = "Replace With ").pack(side = LEFT)
 
@@ -91,25 +95,20 @@ class realMenu(Menu):
 
         # function to search string in text
         def find():
-            
             # remove tag 'found' from index 1 to END
             textEditor.tag_remove('found', '1.0', END)
-            
             # returns to widget currently in focus
-            s = edit.get()
-            
-            if (s):
+            search = edit.get()
+            if search:
                 idx = '1.0'
                 while 1:
                     # searches for desired string from index 1
-                    idx = textEditor.search(s, idx, nocase = 1, stopindex = END)
-                    
-                    if not idx: break
-                    
+                    idx = textEditor.search(search, idx, nocase = 1, stopindex = END)
+                    if not idx:
+                        break
                     # last index sum of current index and
                     # length of text
-                    lastidx = '% s+% dc' % (idx, len(s))
-                    
+                    lastidx = f'{idx} + {len(search)}'
 
                     # overwrite 'Found' at idx
                     textEditor.tag_add('found', idx, lastidx)
@@ -119,33 +118,29 @@ class realMenu(Menu):
                 textEditor.tag_config('found', foreground ='red')
             edit.focus_set()
 
-        def findNreplace():
-            
+        def find_n_replace():
             # remove tag 'found' from index 1 to END
             textEditor.tag_remove('found', '1.0', END)
-            
             # returns to widget currently in focus
-            s = edit.get()
-            r = edit2.get()
-            
-            if (s and r):
+            search = edit.get()
+            replace = edit2.get()
+            if (search and replace):
                 idx = '1.0'
                 while 1:
                     # searches for desired string from index 1
-                    idx = textEditor.search(s, idx, nocase = 1,
+                    idx = textEditor.search(search, idx, nocase = 1,
                                     stopindex = END)
                     print(idx)
-                    if not idx: break
-                    
+                    if not idx:
+                        break
                     # last index sum of current index and
                     # length of text
-                    lastidx = '% s+% dc' % (idx, len(s))
+                    lastidx = f'{idx} + {len(search)}'
 
                     textEditor.delete(idx, lastidx)
-                    textEditor.insert(idx, r)
+                    textEditor.insert(idx, replace)
 
-                    lastidx = '% s+% dc' % (idx, len(r))
-                    
+                    lastidx = f'{idx} + {len(search)}'
                     # overwrite 'Found' at idx
                     textEditor.tag_add('found', idx, lastidx)
                     idx = lastidx
@@ -154,92 +149,99 @@ class realMenu(Menu):
                 textEditor.tag_config('found', foreground ='green', background = 'yellow')
             edit.focus_set()
 
-                        
-        Find.config(command = find)
-        replace.config(command = findNreplace)
+        find_b.config(command = find)
+        replace.config(command = find_n_replace)
 
-def getNewFile():
-    file = None
+def get_new_file():
+    '''for new file function'''
+    if file is not None:
+        file = None
     root.title("Untitled - Real Text Editor")
     textEditor.delete(1.0, END)
 
-def getOpenFile():
-    fileExt= [('All files','*.*'),('Text Document','*.txt')]
-    f=fd.askopenfile(filetypes=fileExt, defaultextension=('Text File',('*,txt')), 
+def get_open_file():
+    '''for open file function'''
+    file_ext= [('All files','*.*'),('Text Document','*.txt')]
+    file_name=fd.askopenfile(filetypes=file_ext, defaultextension=('Text File',('*,txt')),
                         title='Open File in Real Text Editor')
-    if f is not None:
-        content=f.read()
+    if file_name is not None:
+        content=file_name.read()
         print(content)
         textEditor.insert('1.0', content)
-        print(f)
-        root.wm_title(f)
+        print(file_name)
+        root.wm_title(file_name)
 
-def getSaveAsFile():
-    fileExt= [('All files','*.*'),('Text Document','*.txt')]
-    fileName = fd.asksaveasfile(initialfile='untitled.txt', 
-                                    defaultextension='.txt', filetypes=fileExt)
+def get_save_as_file():
+    '''for save as file menu function'''
+    file_ext= [('All files','*.*'),('Text Document','*.txt')]
+    file_name = fd.asksaveasfile(initialfile='untitled.txt',
+                                    defaultextension='.txt', filetypes=file_ext)
     try:
-        with open(fileName.name, 'w') as f:
+        with open(file_name.name, 'w', encoding='utf-16') as file_p:
             contents = textEditor.get("1.0","end-1c")
-            f.write(contents)
+            file_p.write(contents)
 
     except FileNotFoundError:
         return 'cancelled'
 
-def getSaveFile():
-    global file
-    if file == None:
+def get_save_file():
+    '''for save option function'''
+    if FILE is None:
         file = asksaveasfilename(initialfile = 'Untitled.txt', defaultextension=".txt",
                            filetypes=[("All Files", "*.*"), ("Text Documents", "*.txt")])
         if file =="":
             file = None
         else:
             #Save as a new file
-            with open(file.name, 'w') as f:
+            with open(file.name, 'w', encoding='utf-16') as file_p:
                 contents = textEditor.get("1.0","end-1c")
-                f.write(contents)
+                file_p.write(contents)
 
             root.title(file + " - Real Text Editor")
             print("File Saved")
     else:
         # Save the file
-        f = open(file, "w")
-        f.write(textEditor.get(1.0, END))
-        f.close()
+        with open(file, "w", encoding='utf-16') as file_p:
+            file_p.write(textEditor.get(1.0, END))
 
-def getExitFile(event=None):
-    if file is None:
+def get_exit_file():
+    '''for exit function of window'''
+    if FILE is None:
         option = askquestion(title='Save CURRENT file', message='Save Or Quit')
         print(option)
-        if option == True:
-            getSaveFile()
+        if option:
+            get_save_file()
     root.destroy()
 
     print('ok')
 
 def get():
+    '''get function'''
     print('ok')
 
-def getUndoEdit(event=None):
+def get_undo_edit():
+    '''get undo edit function'''
     textEditor.event_generate(("<Undo>"))
 
-def getRedoEdit(event=None):
+def get_redo_edit():
+    '''get redo edit'''
     textEditor.event_generate(("<Redo>"))
 
-def getReplaceEdit():
+def get_replace_edit():
+    '''get replace edit function'''
     print('ok')
 
-def getSelectAllView():
-    pass
+def get_select_all_view():
+    '''selct all function'''
+    print('ok')
 
-def getCopy(event=None):
+def get_copy():
+    '''copy function'''
     textEditor.event_generate(("<Copy>"))
 
-def getCut(event=None):
+def get_cut():
+    '''cut function'''
     textEditor.event_generate(("<Cut>"))
-
-
-
 
 editingFrame = Frame(root)
 editingFrame.pack(fill='both', expand=-1)
@@ -268,9 +270,9 @@ lb.pack(side='right', expand=1)
 
 
 if __name__=='__main__':
-    realMenu(mainMenu)
-    root.bind('<Control-s>',getSaveFile)
-    root.bind('<Control-S>',getSaveFile)
-    root.bind('<Control-x>',getExitFile)
-    root.bind('<Control-X>',getExitFile)
+    RealMenu(mainMenu)
+    root.bind('<Control-s>',get_save_file)
+    root.bind('<Control-S>',get_save_file)
+    root.bind('<Control-x>',get_exit_file)
+    root.bind('<Control-X>',get_exit_file)
     root.mainloop()
