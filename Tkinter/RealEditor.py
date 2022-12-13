@@ -10,7 +10,6 @@ root.wm_iconbitmap('editorIcon.ico')
 root.wm_geometry('340x220')
 
 global file
-file = None
 
 class realMenu(Menu):
     counter = 0
@@ -43,8 +42,10 @@ class realMenu(Menu):
 
         helpMenu = Menu(mainMenu, tearoff='off')
         mainMenu.add_cascade(label='View', menu = helpMenu)
-        helpMenu.add_command(label='About', command=getAboutEditor, bitmap="questhead", compound='left')
-        helpMenu.add_command(label='Helps', command=getAboutEditor, bitmap="question", compound='left')
+        helpMenu.add_command(label='About', command=getAboutEditor, 
+                                    bitmap="questhead", compound='left')
+        helpMenu.add_command(label='Helps', command=getAboutEditor, 
+                                    bitmap="question", compound='left')
     
     def getFindEdit(self):
         self.counter += 1
@@ -164,8 +165,8 @@ def getNewFile():
 
 def getOpenFile():
     fileExt= [('All files','*.*'),('Text Document','*.txt')]
-    f=fd.askopenfile(filetypes=fileExt, 
-        defaultextension=('Text File',('*,txt')), title='Open File in Real Text Editor')
+    f=fd.askopenfile(filetypes=fileExt, defaultextension=('Text File',('*,txt')), 
+                        title='Open File in Real Text Editor')
     if f is not None:
         content=f.read()
         print(content)
@@ -178,13 +179,8 @@ def getSaveAsFile():
     fileName = fd.asksaveasfile(initialfile='untitled.txt', 
                                     defaultextension='.txt', filetypes=fileExt)
     try:
-        print('='*100)
-        contents = textEditor.get(1.0, END)
-        print(contents)
-        print('='*100)
-        print('*'*100)
         with open(fileName.name, 'w') as f:
-            contents = textEditor.get(1.0, END)
+            contents = textEditor.get("1.0","end-1c")
             f.write(contents)
 
     except FileNotFoundError:
@@ -194,15 +190,14 @@ def getSaveFile():
     global file
     if file == None:
         file = asksaveasfilename(initialfile = 'Untitled.txt', defaultextension=".txt",
-                           filetypes=[("All Files", "*.*"),
-                                     ("Text Documents", "*.txt")])
+                           filetypes=[("All Files", "*.*"), ("Text Documents", "*.txt")])
         if file =="":
             file = None
-
         else:
             #Save as a new file
-            with open(file, 'w') as f:
-                f.write(TextArea.get(1.0, END))
+            with open(file.name, 'w') as f:
+                contents = textEditor.get("1.0","end-1c")
+                f.write(contents)
 
             root.title(file + " - Real Text Editor")
             print("File Saved")
