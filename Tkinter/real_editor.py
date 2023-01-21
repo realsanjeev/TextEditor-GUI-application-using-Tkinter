@@ -1,6 +1,7 @@
 '''importing tkinter different class and method'''
 from tkinter import Tk, Menu, Frame, Button, Toplevel
-from tkinter import Label, Scrollbar, END, LEFT, BOTH, BOTTOM, TOP, RIGHT, Text, Entry
+from tkinter import Label, Scrollbar, Text, Entry
+from tkinter import ttk
 from tkinter.messagebox import showinfo,  askquestion
 from tkinter import filedialog as fd
 from tkinter.filedialog import asksaveasfilename
@@ -8,7 +9,7 @@ from view import getAboutEditor
 
 root = Tk(screenName='Real Text Editor')
 root.wm_title('Real Text Editor')
-root.wm_iconbitmap('editorIcon.ico')
+root.wm_iconbitmap('computer.ico')
 root.wm_geometry('340x220')
 
 FILE = None
@@ -67,43 +68,43 @@ class RealMenu(Menu):
         fram = Frame(rfind)
 
         # Creating Label, Entry Box, Button and packing them adding label tosearch box
-        Label(fram, text ='Find').pack(side = LEFT)
+        Label(fram, text ='Find').pack(side='left')
 
         # adding of single line text box
         edit = Entry(fram)
 
         # positioning of text box
-        edit.pack(side = LEFT, fill = BOTH, expand = 1)
+        edit.pack(side='left', fill='both', expand = 1)
 
         # setting focus
         edit.focus_set()
 
         # adding of search button
         find_b = Button(fram, text ='Find')
-        find_b.pack(side = LEFT)
+        find_b.pack(side='left')
 
-        Label(fram, text = "Replace With ").pack(side = LEFT)
+        Label(fram, text = "Replace With ").pack(side='left')
 
         edit2 = Entry(fram)
-        edit2.pack(side = LEFT, fill = BOTH, expand = 1)
+        edit2.pack(side='left', fill='both', expand = 1)
         edit2.focus_set()
 
         replace = Button(fram, text = 'Replace')
-        replace.pack(side = LEFT)
+        replace.pack(side='left')
 
-        fram.pack(side = TOP)
+        fram.pack(side='top')
 
         # function to search string in text
         def find():
             # remove tag 'found' from index 1 to END
-            textEditor.tag_remove('found', '1.0', END)
+            text_editor.tag_remove('found', '1.0', 'end')
             # returns to widget currently in focus
             search = edit.get()
             if search:
                 idx = '1.0'
                 while 1:
                     # searches for desired string from index 1
-                    idx = textEditor.search(search, idx, nocase = 1, stopindex = END)
+                    idx = text_editor.search(search, idx, nocase = 1, stopindex = 'end')
                     if not idx:
                         break
                     # last index sum of current index and
@@ -111,16 +112,16 @@ class RealMenu(Menu):
                     lastidx = f'{idx} + {len(search)}'
 
                     # overwrite 'Found' at idx
-                    textEditor.tag_add('found', idx, lastidx)
+                    text_editor.tag_add('found', idx, lastidx)
                     idx = lastidx
 
                     # mark located string as red
-                textEditor.tag_config('found', foreground ='red')
+                text_editor.tag_config('found', foreground ='red')
             edit.focus_set()
 
         def find_n_replace():
             # remove tag 'found' from index 1 to END
-            textEditor.tag_remove('found', '1.0', END)
+            text_editor.tag_remove('found', '1.0', 'end')
             # returns to widget currently in focus
             search = edit.get()
             replace = edit2.get()
@@ -128,8 +129,8 @@ class RealMenu(Menu):
                 idx = '1.0'
                 while 1:
                     # searches for desired string from index 1
-                    idx = textEditor.search(search, idx, nocase = 1,
-                                    stopindex = END)
+                    idx = text_editor.search(search, idx, nocase = 1,
+                                    stopindex = 'end')
                     print(idx)
                     if not idx:
                         break
@@ -137,72 +138,83 @@ class RealMenu(Menu):
                     # length of text
                     lastidx = f'{idx} + {len(search)}'
 
-                    textEditor.delete(idx, lastidx)
-                    textEditor.insert(idx, replace)
+                    text_editor.delete(idx, lastidx)
+                    text_editor.insert(idx, replace)
 
                     lastidx = f'{idx} + {len(search)}'
                     # overwrite 'Found' at idx
-                    textEditor.tag_add('found', idx, lastidx)
+                    text_editor.tag_add('found', idx, lastidx)
                     idx = lastidx
 
                 # mark located string as red
-                textEditor.tag_config('found', foreground ='green', background = 'yellow')
+                text_editor.tag_config('found', foreground ='green', background = 'yellow')
             edit.focus_set()
 
         find_b.config(command = find)
         replace.config(command = find_n_replace)
 
 def get_new_file():
-    '''for new file function'''
+    '''
+    for creation of new file
+    Return: 
+        New file for text-editor
+    '''
     if file is not None:
         file = None
     root.title("Untitled - Real Text Editor")
-    textEditor.delete(1.0, END)
+    text_editor.delete(1.0, 'end')
 
 def get_open_file():
     '''for open file function'''
-    file_ext= [('All files','*.*'),('Text Document','*.txt')]
-    file_name=fd.askopenfile(filetypes=file_ext, defaultextension=('Text File',('*,txt')),
-                        title='Open File in Real Text Editor')
+    file_ext= [('All files','*.*'),
+                ('Text Document','*.txt')]
+    file_name=fd.askopenfile(filetypes=file_ext, 
+                            defaultextension=('Text File',('*,txt')),
+                            title='Open File in Real Text Editor')
     if file_name is not None:
-        content=file_name.read()
-        print(content)
-        textEditor.insert('1.0', content)
-        print(file_name)
-        root.wm_title(file_name)
+        content=file_name.read() 
+        text_editor.insert('1.0', content) 
+        title = file_name.name.split('/') 
+        # print(f'file name: {title[-1]} and filetype: {type(file_name)}')
+        root.wm_title('Real Text Editor - ' + title[-1])
 
 def get_save_as_file():
     '''for save as file menu function'''
-    file_ext= [('All files','*.*'),('Text Document','*.txt')]
+    file_ext = [('All files','*.*'),
+                ('Text Document','*.txt')]
     file_name = fd.asksaveasfile(initialfile='untitled.txt',
-                                    defaultextension='.txt', filetypes=file_ext)
+                                    defaultextension='.txt', 
+                                    confirmoverwrite=True,
+                                    filetypes=file_ext)
     try:
-        with open(file_name.name, 'w', encoding='utf-16') as file_p:
-            contents = textEditor.get("1.0","end-1c")
-            file_p.write(contents)
-
+        with open(file_name.name, 'w', encoding='utf-16') as file_save_name:
+            contents = text_editor.get("1.0","end-1c")
+            file_save_name.write(contents)
     except FileNotFoundError:
         return 'cancelled'
 
 def get_save_file():
     '''for save option function'''
+    file_ext = [("All Files", "*.*"), 
+                ("Text Documents", "*.txt")]
     if FILE is None:
-        file = asksaveasfilename(initialfile = 'Untitled.txt', defaultextension=".txt",
-                           filetypes=[("All Files", "*.*"), ("Text Documents", "*.txt")])
+        file = asksaveasfilename(initialfile='Untitled.txt', 
+                                defaultextension=".txt",
+                                filetypes=file_ext)
         if file =="":
             file = None
         else:
             #Save as a new file
-            with open(file.name, 'w', encoding='utf-16') as file_p:
-                contents = textEditor.get("1.0","end-1c")
-                file_p.write(contents)
+            with open(file.name, 'w', encoding='utf-16') as file_save_name:
+                contents = text_editor.get("1.0","end-1c")
+                file_save_name.write(contents)
 
-            root.title(file + " - Real Text Editor")
+            root.wm_title(file + " - Real Text Editor")
             print("File Saved")
     else:
         # Save the file
         with open(file, "w", encoding='utf-16') as file_p:
-            file_p.write(textEditor.get(1.0, END))
+            file_p.write(text_editor.get(1.0, 'end-1c'))
 
 def get_exit_file():
     '''for exit function of window'''
@@ -221,11 +233,11 @@ def get():
 
 def get_undo_edit():
     '''get undo edit function'''
-    textEditor.event_generate(("<Undo>"))
+    text_editor.event_generate(("<Undo>"))
 
 def get_redo_edit():
     '''get redo edit'''
-    textEditor.event_generate(("<Redo>"))
+    text_editor.event_generate(("<Redo>"))
 
 def get_replace_edit():
     '''get replace edit function'''
@@ -237,32 +249,44 @@ def get_select_all_view():
 
 def get_copy():
     '''copy function'''
-    textEditor.event_generate(("<Copy>"))
+    text_editor.event_generate(("<Copy>"))
 
 def get_cut():
     '''cut function'''
-    textEditor.event_generate(("<Cut>"))
+    text_editor.event_generate(("<Cut>"))
 
-editingFrame = Frame(root)
-editingFrame.pack(fill='both', expand=-1)
+editing_frame = Frame(root)
+editing_frame.pack(fill='both', expand=1)
 
 labelFrame=Frame(root)
 labelFrame.pack(side='bottom')
 
 mainMenu = Menu(root)
-root.config(menu = mainMenu)
+root.config(menu=mainMenu)
 
-textEditor=Text(editingFrame)
-textEditor.pack(fill='both', expand=True)
+text_editor=Text(editing_frame, padx=2, pady=2)
+text_editor.pack(anchor='nw', fill='both', expand='1', padx=3, pady=2)
 
-yscrollbar = Scrollbar(textEditor, orient='vertical')
-yscrollbar.pack(side=RIGHT, fill='y')
+yscrollbar = ttk.Scrollbar(text_editor, orient='vertical',
+                            cursor='arrow', command=text_editor.yview)
+yscrollbar.pack(side='right', fill='y', padx=0, pady=0)
 
-xscrollbar = Scrollbar(textEditor, orient='horizontal')
-xscrollbar.pack(side=BOTTOM, fill='x')
+xscrollbar = ttk.Scrollbar(text_editor, orient='horizontal',
+                           cursor='arrow', command=text_editor.xview)
+xscrollbar.pack(side='bottom', fill='x',  padx=0, pady=0)
 
-textEditor.config(yscrollcommand=yscrollbar.set, state='normal', xscrollcommand=xscrollbar.set,
-                        undo=True, endline=5)
+#  communicate back to the scrollbar
+text_editor['yscrollcommand'] = yscrollbar.set
+text_editor['xscrollcommand'] = xscrollbar.set
+
+# text_editor.config( background='red',
+#                     yscrollcommand=yscrollbar.set, 
+#                     state='normal', 
+#                     xscrollcommand=xscrollbar.set,
+#                     tabstyle='tabular',
+#                     undo=True, 
+#                     endline=5
+#                     )
 
 lb=Label(labelFrame, text='REALTEXT')
 lb.pack(side='right', expand=1)
