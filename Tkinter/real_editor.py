@@ -161,8 +161,8 @@ def get_new_file():
     '''
     if file is not None:
         file = None
-    root.title("Untitled - Real Text Editor")
-    text_editor.delete(1.0, 'end')
+    root.wm_title("Untitled - Real Text Editor")
+    text_editor.delete(1.0, 'end-1c')
 
 def get_open_file():
     '''
@@ -178,8 +178,11 @@ def get_open_file():
         content=file_name.read()
         text_editor.delete(1.0, 'end') 
         text_editor.insert('1.0', content) 
+        print(f'Type of content: {type(content)} and file_name: {file_name}')
+        print('-'*100)
         title = file_name.name.split('/') 
-        # print(f'file name: {title[-1]} and filetype: {type(file_name)}')
+        print(f'file name: {title[-1]} and filetype: {type(file_name)}')
+
         root.wm_title('Real Text Editor - ' + title[-1])
 
 def get_save_as_file():
@@ -193,7 +196,7 @@ def get_save_as_file():
     try:
         with open(file_name.name, 'wb') as file_save_name:
             contents = text_editor.get("1.0","end-1c")
-            file_save_name.write(contents)
+            file_save_name.write(bytes(contents, 'cp1252'))
     except FileNotFoundError:
         return 'cancelled'
 
@@ -209,15 +212,15 @@ def get_save_file():
             file = None
         else:
             #Save as a new file
-            with open(file.name, 'wb', encoding='utf-16') as file_save_name:
+            with open(file.name, 'w') as file_save_name:
                 contents = text_editor.get("1.0","end-1c")
-                file_save_name.write(contents)
+                file_save_name.write(bytes(contents, 'cp1252'))
 
             root.wm_title(file + " - Real Text Editor")
             print("File Saved")
     else:
         # Save the file
-        with open(file, "w", encoding='utf-16') as file_p:
+        with open(file, "w", encoding='cp1252') as file_p:
             file_p.write(text_editor.get(1.0, 'end-1c'))
 
 def get_exit_file():
