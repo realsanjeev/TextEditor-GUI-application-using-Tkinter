@@ -165,14 +165,18 @@ def get_new_file():
     text_editor.delete(1.0, 'end')
 
 def get_open_file():
-    '''for open file function'''
+    '''
+    Open Dialog box for chosing file to be opened.
+    It is only valid for text-only file. Such as .py, .txt, .c extension etc
+    '''
     file_ext= [('All files','*.*'),
                 ('Text Document','*.txt')]
     file_name=fd.askopenfile(filetypes=file_ext, 
                             defaultextension=('Text File',('*,txt')),
                             title='Open File in Real Text Editor')
     if file_name is not None:
-        content=file_name.read() 
+        content=file_name.read()
+        text_editor.delete(1.0, 'end') 
         text_editor.insert('1.0', content) 
         title = file_name.name.split('/') 
         # print(f'file name: {title[-1]} and filetype: {type(file_name)}')
@@ -187,7 +191,7 @@ def get_save_as_file():
                                     confirmoverwrite=True,
                                     filetypes=file_ext)
     try:
-        with open(file_name.name, 'w', encoding='utf-16') as file_save_name:
+        with open(file_name.name, 'wb') as file_save_name:
             contents = text_editor.get("1.0","end-1c")
             file_save_name.write(contents)
     except FileNotFoundError:
@@ -205,7 +209,7 @@ def get_save_file():
             file = None
         else:
             #Save as a new file
-            with open(file.name, 'w', encoding='utf-16') as file_save_name:
+            with open(file.name, 'wb', encoding='utf-16') as file_save_name:
                 contents = text_editor.get("1.0","end-1c")
                 file_save_name.write(contents)
 
