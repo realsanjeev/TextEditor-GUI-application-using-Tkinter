@@ -1,6 +1,6 @@
 '''importing tkinter different class and method'''
 from tkinter import Tk, Menu, Frame, Button, Toplevel
-from tkinter import Label, Scrollbar, Text, Entry
+from tkinter import Label, Text, Entry
 from tkinter import ttk
 from tkinter.messagebox import showinfo,  askquestion
 from tkinter import filedialog as fd
@@ -264,8 +264,9 @@ labelFrame.pack(side='bottom')
 mainMenu = Menu(root)
 root.config(menu=mainMenu)
 
-text_editor=Text(editing_frame, padx=2, pady=2)
-text_editor.pack(anchor='nw', fill='both', expand='1', padx=3, pady=2)
+text_editor=Text(editing_frame, padx=3, pady=2, 
+                        wrap='none', undo=True, maxundo=10)
+text_editor.pack(anchor='nw', fill='both', expand='1', padx=1, pady=2)
 
 yscrollbar = ttk.Scrollbar(text_editor, orient='vertical',
                             cursor='arrow', command=text_editor.yview)
