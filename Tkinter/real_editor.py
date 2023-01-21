@@ -45,7 +45,7 @@ class RealMenu(Menu):
         view_menu.add_command(label='Status Bar', command=get)
 
         help_menu = Menu(mainMenu, tearoff='off')
-        mainMenu.add_cascade(label='View', menu = help_menu)
+        mainMenu.add_cascade(label='Help', menu = help_menu)
         help_menu.add_command(label='About', command=getAboutEditor,
                                     bitmap="questhead", compound='left')
         help_menu.add_command(label='Helps', command=getAboutEditor,
@@ -272,16 +272,17 @@ mainMenu = Menu(root)
 root.config(menu=mainMenu)
 
 text_editor=Text(editing_frame, padx=3, pady=2, 
-                        wrap='none', undo=True, maxundo=10)
+                        wrap='none', maxundo=10,
+                        undo=True, blockcursor=True, autoseparators=True)
 text_editor.pack(anchor='nw', fill='both', expand='1', padx=1, pady=2)
 
 yscrollbar = ttk.Scrollbar(text_editor, orient='vertical',
-                            cursor='arrow', command=text_editor.yview)
-yscrollbar.pack(side='right', fill='y', padx=0, pady=0)
+                            cursor='arrow', command=text_editor.yview,)
+yscrollbar.pack(side='right', fill='y')
 
 xscrollbar = ttk.Scrollbar(text_editor, orient='horizontal',
                            cursor='arrow', command=text_editor.xview)
-xscrollbar.pack(side='bottom', fill='x',  padx=0, pady=0)
+xscrollbar.pack(side='bottom', fill='x')
 
 #  communicate back to the scrollbar
 text_editor['yscrollcommand'] = yscrollbar.set
