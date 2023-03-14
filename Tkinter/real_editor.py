@@ -1,8 +1,30 @@
-'''importing tkinter different class and method'''
+"""
+Module to create a text editor using tkinter GUI.
+
+This module imports necessary classes and methods from tkinter for GUI creation.
+Classes:
+
+Tk: The main tkinter window.
+Menu: The tkinter menu.
+Frame: The tkinter frame for widgets.
+Button: The tkinter button.
+Toplevel: The tkinter toplevel window.
+Label: The tkinter label.
+Text: The tkinter text widget.
+Entry: The tkinter entry widget.
+ttk: The tkinter themed widgets.
+showinfo: The tkinter messagebox to display information.
+askquestion: The tkinter messagebox to ask question.
+fd: The tkinter filedialog for open and save.
+asksaveasfilename: The tkinter filedialog to save files.
+getAboutEditor: A function to get the about information for the text editor.
+Functions:
+"""
+
 from tkinter import Tk, Menu, Frame, Button, Toplevel
 from tkinter import Label, Text, Entry
 from tkinter import ttk
-from tkinter.messagebox import showinfo,  askquestion
+from tkinter.messagebox import showinfo, askquestion
 from tkinter import filedialog as fd
 from tkinter.filedialog import asksaveasfilename
 from view import getAboutEditor
@@ -15,10 +37,25 @@ root.wm_geometry('340x220')
 FILE = None
 
 class RealMenu(Menu):
-    '''Making menu class'''
+    """A class representing a customized menu.
+
+    Attributes:
+        counter (int): A class attribute to keep track of the number of instances.
+        msg (str): A class attribute representing the creation message.
+
+    Args:
+        master (obj): The parent object that the menu belongs to.
+    """
     counter = 0
     msg='''This is real's Creation'''
+
     def __init__(self, master):
+        """
+        Initializes a new instance of the RealMenu class.
+
+        Args:
+            master (obj): The parent object that the menu belongs to.
+        """
         Menu.__init__(self, master)
         file_menu = Menu(self, tearoff='off')
         mainMenu.add_cascade(label = 'File', menu = file_menu)
@@ -154,11 +191,9 @@ class RealMenu(Menu):
         replace.config(command = find_n_replace)
 
 def get_new_file():
-    '''
-    for creation of new file
-    Return: 
-        New file for text-editor
-    '''
+    """
+    Clears the text editor and sets the title to 'Untitled - Real Text Editor'.
+    """
     if file is not None:
         file = None
     root.wm_title("Untitled - Real Text Editor")
@@ -166,16 +201,16 @@ def get_new_file():
 
 def get_open_file():
     '''
-    Open Dialog box for chosing file to be opened.
-    It is only valid for text-only file. Such as .py, .txt, .c extension etc
+    Open a dialog box to select a text-only file, such as .py, .txt, or .c extension,
+    to be opened in Real Text Editor.
     '''
-    file_ext= [('All files','*.*'),
-                ('Text Document','*.txt')]
-    file_name=fd.askopenfile(filetypes=file_ext, 
+    file_ext = [('All files', '*.*'),
+                ('Text Document', '*.txt')]
+    file_name = fd.askopenfile(filetypes=file_ext, 
                             defaultextension=('Text File',('*,txt')),
                             title='Open File in Real Text Editor')
     if file_name is not None:
-        content=file_name.read()
+        content = file_name.read()
         text_editor.delete(1.0, 'end') 
         text_editor.insert('1.0', content) 
         print(f'Type of content: {type(content)} and file_name: {file_name}')
@@ -185,8 +220,14 @@ def get_open_file():
 
         root.wm_title('Real Text Editor - ' + title[-1])
 
+
 def get_save_as_file():
-    '''for save as file menu function'''
+    """
+    Open a dialog box to save the file with the chosen name and format.
+
+    Returns:
+        If file is not saved: returns 'cancelled'.
+    """
     file_ext = [('All files','*.*'),
                 ('Text Document','*.txt')]
     file_name = fd.asksaveasfile(initialfile='untitled.txt',
@@ -200,8 +241,11 @@ def get_save_as_file():
     except FileNotFoundError:
         return 'cancelled'
 
+
 def get_save_file():
-    '''for save option function'''
+    '''
+    Save the content to an existing file or save as a new file.
+    '''
     file_ext = [("All Files", "*.*"), 
                 ("Text Documents", "*.txt")]
     if FILE is None:
@@ -224,7 +268,11 @@ def get_save_file():
             file_p.write(text_editor.get(1.0, 'end-1c'))
 
 def get_exit_file():
-    '''for exit function of window'''
+    '''
+    This function prompts the user to save changes before closing the application window.
+    If the user clicks "Yes", the changes are saved and the application window is closed.
+    If the user clicks "No", the application window is closed without saving changes.
+    '''
     if FILE is None:
         option = askquestion(title='Save CURRENT file', message='Save Or Quit')
         print(option)
@@ -234,29 +282,35 @@ def get_exit_file():
 
     print('ok')
 
+
 def get():
     '''get function'''
     print('ok')
 
 def get_undo_edit():
-    '''get undo edit function'''
+    """
+    Generates an event for the text editor to perform undo operation.
+    """
     text_editor.event_generate(("<Undo>"))
 
 def get_redo_edit():
-    '''get redo edit'''
+    """
+    Generates an event for the text editor to perform redo operation.
+    """
     text_editor.event_generate(("<Redo>"))
 
+def get_copy():
+    """
+    Generates an event for the text editor to copy the selected text.
+    """
+    text_editor.event_generate(("<Copy>"))
+
+
 def get_replace_edit():
-    '''get replace edit function'''
     print('ok')
 
 def get_select_all_view():
-    '''selct all function'''
     print('ok')
-
-def get_copy():
-    '''copy function'''
-    text_editor.event_generate(("<Copy>"))
 
 def get_cut():
     '''cut function'''
