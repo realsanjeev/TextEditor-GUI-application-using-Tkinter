@@ -1,4 +1,4 @@
-from tkinter.messagebox import showinfo
+import tkinter.messagebox as messagebox
 
 def getAboutEditor():
     """
@@ -7,10 +7,22 @@ def getAboutEditor():
     Returns:
         None
     """
-    msg='''
-    This is Real Text Editor. Real Text Editor is developed by Real Sanjeev.
-    This project is made using tkinter python GNU Liabiries. Most of program is procedural programing method rather than objet oriented approach. It is easy to understand program
+    msg = '''\
+    This is Real Text Editor. 
+    
+    Real Text Editor is developed by Real Sanjeev.
+    This project is made using tkinter python GNU Libraries. Most of the program uses a procedural programming method rather than an object-oriented approach. It is easy to understand the program.
 
-    Develop for educational purpose. 
+    Developed for educational purposes.
     '''
-    showinfo(title='About Real Text Editor', message=msg)
+    messagebox.showinfo(
+        title='About Real Text Editor',
+        message=msg,
+        icon=messagebox.INFO,
+        type=messagebox.OK
+    )
+
+def display_in_console(str):
+    print("*"*30)
+    print(str)
+    print("*"*30)

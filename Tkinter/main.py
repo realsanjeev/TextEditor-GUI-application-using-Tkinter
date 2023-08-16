@@ -27,7 +27,7 @@ from tkinter import ttk
 from tkinter.messagebox import showinfo, askquestion
 from tkinter import filedialog as fd
 from tkinter.filedialog import asksaveasfilename
-from view import getAboutEditor
+from view import getAboutEditor, display_in_console
 
 root = Tk(screenName='Real Text Editor')
 root.wm_title('Real Text Editor')
@@ -75,7 +75,7 @@ class RealMenu(Menu):
         edit_menu.add_command(label='Copy', command=get_copy)
         edit_menu.add_separator()
         edit_menu.add_command(label='Find', command=self.get_find_edit)
-        edit_menu.add_command(label='Replace', command=get_replace_edit)
+        edit_menu.add_command(label='Replace', command=self.get_find_edit)
 
         view_menu = Menu(mainMenu, tearoff='off')
         mainMenu.add_cascade(label='View', menu = view_menu)
@@ -89,106 +89,73 @@ class RealMenu(Menu):
                                     bitmap="question", compound='left')
 
     def get_find_edit(self):
-        '''for find edit function'''
-        self.counter += 1
+        '''Function to open a child window for find and replace operations.'''
 
-        if self.counter > 1:
-            self.msg='''Please you already have find and replace opened.
-                '''
-            showinfo(title='Error', message=self.msg)
-            return
-        # to only open one window for find and replace
+        child_window = Toplevel(self)
+        child_window.wm_iconbitmap('search.ico')
 
-        rfind = Toplevel(self)
-        rfind.wm_iconbitmap('search.ico')
-        # rfind window is the parent window
-        fram = Frame(rfind)
+        search_frame = Frame(child_window)
 
-        # Creating Label, Entry Box, Button and packing them adding label tosearch box
-        Label(fram, text ='Find').pack(side='left')
-
-        # adding of single line text box
-        edit = Entry(fram)
-
-        # positioning of text box
-        edit.pack(side='left', fill='both', expand = 1)
-
-        # setting focus
+        # Creating Label, Entry Boxes, and Buttons for Find and Replace
+        Label(search_frame, text='Find').pack(side='left')
+        edit = Entry(search_frame)
+        edit.pack(side='left', fill='both', expand=1)
         edit.focus_set()
 
-        # adding of search button
-        find_b = Button(fram, text ='Find')
-        find_b.pack(side='left')
+        find_btn = Button(search_frame, text='Find', command=lambda: find(edit))
+        find_btn.pack(side='left')
 
-        Label(fram, text = "Replace With ").pack(side='left')
-
-        edit2 = Entry(fram)
-        edit2.pack(side='left', fill='both', expand = 1)
+        Label(search_frame, text='Replace With ').pack(side='left')
+        edit2 = Entry(search_frame)
+        edit2.pack(side='left', fill='both', expand=1)
         edit2.focus_set()
 
-        replace = Button(fram, text = 'Replace')
-        replace.pack(side='left')
+        replace_btn = Button(search_frame, text='Replace', command=lambda: find_and_replace(edit, edit2))
+        replace_btn.pack(side='left')
 
-        fram.pack(side='top')
+        search_frame.pack(side='top')
 
-        # function to search string in text
-        def find():
-            # remove tag 'found' from index 1 to END
-            text_editor.tag_remove('found', '1.0', 'end')
-            # returns to widget currently in focus
-            search = edit.get()
-            if search:
-                idx = '1.0'
-                while 1:
-                    # searches for desired string from index 1
-                    idx = text_editor.search(search, idx, nocase = 1, stopindex = 'end')
-                    if not idx:
-                        break
-                    # last index sum of current index and
-                    # length of text
-                    lastidx = f'{idx} + {len(search)}'
+def find(edit):
+    '''Function to find and highlight occurrences of the search text.'''
+    text_editor.tag_remove('found', '1.0', 'end')
 
-                    # overwrite 'Found' at idx
-                    text_editor.tag_add('found', idx, lastidx)
-                    idx = lastidx
+    search = edit.get()
+    if search:
+        idx = '1.0'
+        while True:
+            idx = text_editor.search(search, idx, nocase=1, stopindex='end')
+            if not idx:
+                break
+            lastidx = f'{idx} + {len(search)}c'
 
-                    # mark located string as red
-                text_editor.tag_config('found', foreground ='red')
-            edit.focus_set()
+            text_editor.tag_add('found', idx, lastidx)
+            idx = lastidx
 
-        def find_n_replace():
-            # remove tag 'found' from index 1 to END
-            text_editor.tag_remove('found', '1.0', 'end')
-            # returns to widget currently in focus
-            search = edit.get()
-            replace = edit2.get()
-            if (search and replace):
-                idx = '1.0'
-                while 1:
-                    # searches for desired string from index 1
-                    idx = text_editor.search(search, idx, nocase = 1,
-                                    stopindex = 'end')
-                    print(idx)
-                    if not idx:
-                        break
-                    # last index sum of current index and
-                    # length of text
-                    lastidx = f'{idx} + {len(search)}'
+        text_editor.tag_config('found', foreground='red')
 
-                    text_editor.delete(idx, lastidx)
-                    text_editor.insert(idx, replace)
+def find_and_replace(edit, edit2):
+    '''Function to find and replace occurrences of the search text with replacement.'''
+    text_editor.tag_remove('found', '1.0', 'end')
 
-                    lastidx = f'{idx} + {len(search)}'
-                    # overwrite 'Found' at idx
-                    text_editor.tag_add('found', idx, lastidx)
-                    idx = lastidx
+    search = edit.get()
+    replace = edit2.get()
 
-                # mark located string as red
-                text_editor.tag_config('found', foreground ='green', background = 'yellow')
-            edit.focus_set()
+    if search and replace:
+        idx = '1.0'
+        while True:
+            idx = text_editor.search(search, idx, nocase=1, stopindex='end')
+            if not idx:
+                break
+            lastidx = f'{idx} + {len(search)}c'
 
-        find_b.config(command = find)
-        replace.config(command = find_n_replace)
+            text_editor.delete(idx, lastidx)
+            text_editor.insert(idx, replace)
+
+            text_editor.tag_add('found', idx, lastidx)
+            idx = lastidx
+
+        text_editor.tag_config('found', foreground='green', background='yellow')
+
 
 def get_new_file():
     """
@@ -213,10 +180,9 @@ def get_open_file():
         content = file_name.read()
         text_editor.delete(1.0, 'end') 
         text_editor.insert('1.0', content) 
-        print(f'Type of content: {type(content)} and file_name: {file_name}')
-        print('-'*100)
+        display_in_console(f'Type of content: {type(content)} and file_name: {file_name}')
         title = file_name.name.split('/') 
-        print(f'file name: {title[-1]} and filetype: {type(file_name)}')
+        display_in_console(f'file name: {title[-1]} and filetype: {type(file_name)}')
 
         root.wm_title('Real Text Editor - ' + title[-1])
 
@@ -261,7 +227,7 @@ def get_save_file():
                 file_save_name.write(bytes(contents, 'cp1252'))
 
             root.wm_title(file + " - Real Text Editor")
-            print("File Saved")
+            display_in_console("File Saved")
     else:
         # Save the file
         with open(file, "w", encoding='cp1252') as file_p:
@@ -275,17 +241,17 @@ def get_exit_file():
     '''
     if FILE is None:
         option = askquestion(title='Save CURRENT file', message='Save Or Quit')
-        print(option)
+        display_in_console(option)
         if option:
             get_save_file()
     root.destroy()
 
-    print('ok')
+    display_in_console('ok')
 
 
 def get():
     '''get function'''
-    print('ok')
+    display_in_console('ok')
 
 def get_undo_edit():
     """
@@ -306,11 +272,8 @@ def get_copy():
     text_editor.event_generate(("<Copy>"))
 
 
-def get_replace_edit():
-    print('ok')
-
 def get_select_all_view():
-    print('ok')
+    display_in_console('Selceted All View')
 
 def get_cut():
     '''cut function'''
