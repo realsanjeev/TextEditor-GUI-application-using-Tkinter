@@ -21,11 +21,10 @@ getAboutEditor: A function to get the about information for the text editor.
 Functions:
 """
 
-from tkinter import Tk, Menu, Frame, Button, Toplevel
-from tkinter import Label, Text, Entry
-from tkinter import ttk
-from tkinter.messagebox import showinfo, askquestion
-from tkinter import filedialog as fd
+from tkinter import (Tk, Menu, Frame, Button, Toplevel,
+                     Label, Text, Entry, ttk,
+                     filedialog as fd)
+from tkinter.messagebox import askquestion
 from tkinter.filedialog import asksaveasfilename
 from view import getAboutEditor, display_in_console
 
@@ -110,7 +109,8 @@ class RealMenu(Menu):
         edit2.pack(side='left', fill='both', expand=1)
         edit2.focus_set()
 
-        replace_btn = Button(search_frame, text='Replace', command=lambda: find_and_replace(edit, edit2))
+        replace_btn = Button(search_frame, text='Replace', 
+                             command=lambda: find_and_replace(edit, edit2))
         replace_btn.pack(side='left')
 
         search_frame.pack(side='top')
