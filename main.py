@@ -20,17 +20,24 @@ asksaveasfilename: The tkinter filedialog to save files.
 getAboutEditor: A function to get the about information for the text editor.
 Functions:
 """
-
+import os
 from tkinter import (Tk, Menu, Frame, Button, Toplevel,
                      Label, Text, Entry, ttk,
                      filedialog as fd)
 from tkinter.messagebox import askquestion
 from tkinter.filedialog import asksaveasfilename
-from view import getAboutEditor, display_in_console
+from PIL import Image, ImageTk
 
-root = Tk(screenName='Real Text Editor')
+from src.view import getAboutEditor, display_in_console
+
+root = Tk()
 root.wm_title('Real Text Editor')
-root.wm_iconbitmap('computer.ico')
+root.configure(background="red")
+# icon of app
+im = Image.open('images/computer.ico')
+photo = ImageTk.PhotoImage(im)
+root.wm_iconphoto(True, photo)
+
 root.wm_geometry('340x220')
 
 FILE = None
@@ -91,7 +98,11 @@ class RealMenu(Menu):
         '''Function to open a child window for find and replace operations.'''
 
         child_window = Toplevel(self)
-        child_window.wm_iconbitmap('search.ico')
+        child_window.wm_title("Find and Replace")
+        # child_window.wm_iconbitmap('images/search.ico')
+        im = Image.open("images/search.ico")
+        photo = ImageTk.PhotoImage(im)
+        child_window.wm_iconphoto(True, photo)
 
         search_frame = Frame(child_window)
 
