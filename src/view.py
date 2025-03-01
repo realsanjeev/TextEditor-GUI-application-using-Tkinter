@@ -1,3 +1,4 @@
+import textwrap
 import tkinter.messagebox as messagebox
 
 def getAboutEditor():
@@ -7,14 +8,18 @@ def getAboutEditor():
     Returns:
         None
     """
-    msg = '''\
+    msg = textwrap.dedent('''\
     This is Real Text Editor. 
     
-    Real Text Editor is developed by Real Sanjeev.
-    This project is made using tkinter python GNU Libraries. Most of the program uses a procedural programming method rather than an object-oriented approach. It is easy to understand the program.
+    Developed by: @realsanjeev.
+
+    This project is made using tkinter python GNU Libraries. \
+        Most of the program uses a procedural programming method \
+        rather than an object-oriented approach. \
+        It is easy to understand the program.
 
     Developed for educational purposes.
-    '''
+    ''')
     messagebox.showinfo(
         title='About Real Text Editor',
         message=msg,

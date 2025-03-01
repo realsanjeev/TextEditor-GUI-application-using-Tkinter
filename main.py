@@ -1,30 +1,8 @@
-"""
-Module to create a text editor using tkinter GUI.
-
-This module imports necessary classes and methods from tkinter for GUI creation.
-Classes:
-
-Tk: The main tkinter window.
-Menu: The tkinter menu.
-Frame: The tkinter frame for widgets.
-Button: The tkinter button.
-Toplevel: The tkinter toplevel window.
-Label: The tkinter label.
-Text: The tkinter text widget.
-Entry: The tkinter entry widget.
-ttk: The tkinter themed widgets.
-showinfo: The tkinter messagebox to display information.
-askquestion: The tkinter messagebox to ask question.
-fd: The tkinter filedialog for open and save.
-asksaveasfilename: The tkinter filedialog to save files.
-getAboutEditor: A function to get the about information for the text editor.
-Functions:
-"""
 import os
 from tkinter import (Tk, Menu, Frame, Button, Toplevel,
                      Label, Text, Entry, ttk,
                      filedialog as fd)
-from tkinter.messagebox import askquestion
+from tkinter.messagebox import askquestion, showinfo
 from tkinter.filedialog import asksaveasfilename
 from PIL import Image, ImageTk
 
@@ -33,103 +11,72 @@ from src.view import getAboutEditor, display_in_console
 root = Tk()
 root.wm_title('Real Text Editor')
 root.configure(background="red")
-# icon of app
+
+# Icon of the app
 im = Image.open('images/computer.ico')
 photo = ImageTk.PhotoImage(im)
 root.wm_iconphoto(True, photo)
 
-root.wm_geometry('340x220')
+# set a minimum window size (width, height)
+root.minsize(500, 400)
+root.geometry('1600x900')
+
 
 FILE = None
 
 class RealMenu(Menu):
-    """A class representing a customized menu.
-
-    Attributes:
-        counter (int): A class attribute to keep track of the number of instances.
-        msg (str): A class attribute representing the creation message.
-
-    Args:
-        master (obj): The parent object that the menu belongs to.
-    """
-    counter = 0
-    msg='''This is real's Creation'''
-
     def __init__(self, master):
-        """
-        Initializes a new instance of the RealMenu class.
-
-        Args:
-            master (obj): The parent object that the menu belongs to.
-        """
-        Menu.__init__(self, master)
-        file_menu = Menu(self, tearoff='off')
-        mainMenu.add_cascade(label = 'File', menu = file_menu)
-        file_menu.add_command(label = 'New', command=get_new_file)
+        super().__init__(master)
+        
+        file_menu = Menu(self, tearoff=0)
+        file_menu.add_command(label='New', command=get_new_file)
         file_menu.add_command(label='Open', command=get_open_file)
         file_menu.add_separator()
         file_menu.add_command(label='Save As', command=get_save_as_file)
         file_menu.add_command(label='Save', command=get_save_file)
         file_menu.add_command(label='Exit', command=get_exit_file)
-
-        edit_menu = Menu(mainMenu, tearoff='off')
-        mainMenu.add_cascade(label='Edit', menu = edit_menu)
-        edit_menu.add_command(label='Undo', command= get_undo_edit)
-        edit_menu.add_command(label='Redo', command= get_redo_edit)
+        self.add_cascade(label='File', menu=file_menu)
+        
+        edit_menu = Menu(self, tearoff=0)
+        edit_menu.add_command(label='Undo', command=get_undo_edit)
+        edit_menu.add_command(label='Redo', command=get_redo_edit)
         edit_menu.add_separator()
-        edit_menu.add_command(label='Cut', command=get_cut, compound='right')
+        edit_menu.add_command(label='Cut', command=get_cut)
         edit_menu.add_command(label='Copy', command=get_copy)
+        edit_menu.add_command(label='Paste', command=get_paste)
         edit_menu.add_separator()
         edit_menu.add_command(label='Find', command=self.get_find_edit)
         edit_menu.add_command(label='Replace', command=self.get_find_edit)
-
-        view_menu = Menu(mainMenu, tearoff='off')
-        mainMenu.add_cascade(label='View', menu = view_menu)
-        view_menu.add_command(label='Status Bar', command=get)
-
-        help_menu = Menu(mainMenu, tearoff='off')
-        mainMenu.add_cascade(label='Help', menu = help_menu)
-        help_menu.add_command(label='About', command=getAboutEditor,
-                                    bitmap="questhead", compound='left')
-        help_menu.add_command(label='Helps', command=getAboutEditor,
-                                    bitmap="question", compound='left')
+        self.add_cascade(label='Edit', menu=edit_menu)
+        
+        view_menu = Menu(self, tearoff=0)
+        view_menu.add_command(label='Status Bar', command=get_status_bar)
+        self.add_cascade(label='View', menu=view_menu)
+        
+        help_menu = Menu(self, tearoff=0)
+        help_menu.add_command(label='About', command=getAboutEditor)
+        help_menu.add_command(label='Help', command=lambda: showinfo('Help', 'Use the menu options to edit text.'))
+        self.add_cascade(label='Help', menu=help_menu)
+        
+        master.config(menu=self)
 
     def get_find_edit(self):
-        '''Function to open a child window for find and replace operations.'''
-
         child_window = Toplevel(self)
-        child_window.wm_title("Find and Replace")
-        # child_window.wm_iconbitmap('images/search.ico')
-        im = Image.open("images/search.ico")
-        photo = ImageTk.PhotoImage(im)
-        child_window.wm_iconphoto(True, photo)
-
-        search_frame = Frame(child_window)
-
-        # Creating Label, Entry Boxes, and Buttons for Find and Replace
-        Label(search_frame, text='Find').pack(side='left')
-        edit = Entry(search_frame)
-        edit.pack(side='left', fill='both', expand=1)
-        edit.focus_set()
-
-        find_btn = Button(search_frame, text='Find', command=lambda: find(edit))
-        find_btn.pack(side='left')
-
-        Label(search_frame, text='Replace With ').pack(side='left')
-        edit2 = Entry(search_frame)
-        edit2.pack(side='left', fill='both', expand=1)
-        edit2.focus_set()
-
-        replace_btn = Button(search_frame, text='Replace', 
-                             command=lambda: find_and_replace(edit, edit2))
-        replace_btn.pack(side='left')
-
-        search_frame.pack(side='top')
+        child_window.title("Find and Replace")
+        
+        Label(child_window, text='Find').grid(row=0, column=0)
+        find_entry = Entry(child_window)
+        find_entry.grid(row=0, column=1)
+        
+        Label(child_window, text='Replace With').grid(row=1, column=0)
+        replace_entry = Entry(child_window)
+        replace_entry.grid(row=1, column=1)
+        
+        Button(child_window, text='Find', command=lambda: find(find_entry)).grid(row=0, column=2)
+        Button(child_window, text='Replace', command=lambda: find_and_replace(find_entry, replace_entry)).grid(row=1, column=2)
 
 def find(edit):
-    '''Function to find and highlight occurrences of the search text.'''
     text_editor.tag_remove('found', '1.0', 'end')
-
     search = edit.get()
     if search:
         idx = '1.0'
@@ -138,202 +85,110 @@ def find(edit):
             if not idx:
                 break
             lastidx = f'{idx} + {len(search)}c'
-
             text_editor.tag_add('found', idx, lastidx)
             idx = lastidx
-
         text_editor.tag_config('found', foreground='red')
 
 def find_and_replace(edit, edit2):
-    '''Function to find and replace occurrences of the search text with replacement.'''
-    text_editor.tag_remove('found', '1.0', 'end')
-
-    search = edit.get()
-    replace = edit2.get()
-
+    search, replace = edit.get(), edit2.get()
     if search and replace:
-        idx = '1.0'
-        while True:
-            idx = text_editor.search(search, idx, nocase=1, stopindex='end')
-            if not idx:
-                break
-            lastidx = f'{idx} + {len(search)}c'
-
-            text_editor.delete(idx, lastidx)
-            text_editor.insert(idx, replace)
-
-            text_editor.tag_add('found', idx, lastidx)
-            idx = lastidx
-
-        text_editor.tag_config('found', foreground='green', background='yellow')
-
+        text_content = text_editor.get('1.0', 'end-1c')
+        new_content = text_content.replace(search, replace)
+        text_editor.delete('1.0', 'end')
+        text_editor.insert('1.0', new_content)
 
 def get_new_file():
-    """
-    Clears the text editor and sets the title to 'Untitled - Real Text Editor'.
-    """
-    if file is not None:
-        file = None
-    root.wm_title("Untitled - Real Text Editor")
-    text_editor.delete(1.0, 'end-1c')
+    global FILE
+    FILE = None
+    root.title("Untitled - Real Text Editor")
+    text_editor.delete(1.0, 'end')
 
 def get_open_file():
-    '''
-    Open a dialog box to select a text-only file, such as .py, .txt, or .c extension,
-    to be opened in Real Text Editor.
-    '''
-    file_ext = [('All files', '*.*'),
-                ('Text Document', '*.txt')]
-    file_name = fd.askopenfile(filetypes=file_ext, 
-                            defaultextension=('Text File',('*,txt')),
-                            title='Open File in Real Text Editor')
-    if file_name is not None:
-        content = file_name.read()
-        text_editor.delete(1.0, 'end') 
-        text_editor.insert('1.0', content) 
-        display_in_console(f'Type of content: {type(content)} and file_name: {file_name}')
-        title = file_name.name.split('/') 
-        display_in_console(f'file name: {title[-1]} and filetype: {type(file_name)}')
-
-        root.wm_title('Real Text Editor - ' + title[-1])
-
+    file_path = fd.askopenfilename(filetypes=[('Text Files', '*.txt'), ('All Files', '*.*')])
+    if file_path:
+        with open(file_path, 'r') as file:
+            text_editor.delete(1.0, 'end')
+            text_editor.insert('1.0', file.read())
+        root.title(f'Real Text Editor - {os.path.basename(file_path)}')
 
 def get_save_as_file():
-    """
-    Open a dialog box to save the file with the chosen name and format.
-
-    Returns:
-        If file is not saved: returns 'cancelled'.
-    """
-    file_ext = [('All files','*.*'),
-                ('Text Document','*.txt')]
-    file_name = fd.asksaveasfile(initialfile='untitled.txt',
-                                    defaultextension='.txt', 
-                                    confirmoverwrite=True,
-                                    filetypes=file_ext)
-    try:
-        with open(file_name.name, 'wb') as file_save_name:
-            contents = text_editor.get("1.0","end-1c")
-            file_save_name.write(bytes(contents, 'cp1252'))
-    except FileNotFoundError:
-        return 'cancelled'
-
+    file_path = asksaveasfilename(filetypes=[('Text Files', '*.txt'), ('All Files', '*.*')])
+    if file_path:
+        with open(file_path, 'w') as file:
+            file.write(text_editor.get('1.0', 'end-1c'))
+        root.title(f'Real Text Editor - {os.path.basename(file_path)}')
 
 def get_save_file():
-    '''
-    Save the content to an existing file or save as a new file.
-    '''
-    file_ext = [("All Files", "*.*"), 
-                ("Text Documents", "*.txt")]
-    if FILE is None:
-        file = asksaveasfilename(initialfile='Untitled.txt', 
-                                defaultextension=".txt",
-                                filetypes=file_ext)
-        if file =="":
-            file = None
-        else:
-            #Save as a new file
-            with open(file.name, 'w') as file_save_name:
-                contents = text_editor.get("1.0","end-1c")
-                file_save_name.write(bytes(contents, 'cp1252'))
-
-            root.wm_title(file + " - Real Text Editor")
-            display_in_console("File Saved")
+    global FILE
+    if FILE:
+        with open(FILE, 'w') as file:
+            file.write(text_editor.get('1.0', 'end-1c'))
     else:
-        # Save the file
-        with open(file, "w", encoding='cp1252') as file_p:
-            file_p.write(text_editor.get(1.0, 'end-1c'))
+        get_save_as_file()
 
 def get_exit_file():
-    '''
-    This function prompts the user to save changes before closing the application window.
-    If the user clicks "Yes", the changes are saved and the application window is closed.
-    If the user clicks "No", the application window is closed without saving changes.
-    '''
-    if FILE is None:
-        option = askquestion(title='Save CURRENT file', message='Save Or Quit')
-        display_in_console(option)
-        if option:
-            get_save_file()
-    root.destroy()
+    if askquestion('Exit', 'Save changes before quitting?') == 'yes':
+        get_save_file()
+    root.quit()
 
-    display_in_console('ok')
+def update_status(event=None, status_bar=None):
+    """Updates the status bar with current line, column, and total lines."""
+    total_lines = int(text_editor.index('end-1c').split('.')[0])  # Total number of lines
+    line, col = text_editor.index('insert').split('.')  # Get current cursor position
 
+    # Update filename if available
+    filename_display = FILE if FILE else "Untitled"
 
-def get():
-    '''get function'''
-    display_in_console('ok')
+    # Update the status bar
+    status_bar.config(text=f"{filename_display} | Line {line}, Col {col} | Total Lines: {total_lines}")
+
+def get_status_bar():
+    status_bar = Label(root, text="Ready", anchor="w", relief="sunken", bd=1, padx=5)
+    status_bar.grid(row=1, column=0, columnspan=2, sticky="ew")
+
+    # Bind events to update status dynamically, passing status_bar as argument
+    text_editor.bind('<KeyRelease>', lambda event: update_status(event, status_bar))
+    text_editor.bind('<ButtonRelease>', lambda event: update_status(event, status_bar))
 
 def get_undo_edit():
-    """
-    Generates an event for the text editor to perform undo operation.
-    """
-    text_editor.event_generate(("<Undo>"))
+    text_editor.edit_undo()
 
 def get_redo_edit():
-    """
-    Generates an event for the text editor to perform redo operation.
-    """
-    text_editor.event_generate(("<Redo>"))
+    text_editor.edit_redo()
 
 def get_copy():
-    """
-    Generates an event for the text editor to copy the selected text.
-    """
-    text_editor.event_generate(("<Copy>"))
-
-
-def get_select_all_view():
-    display_in_console('Selceted All View')
+    text_editor.event_generate("<<Copy>>")
 
 def get_cut():
-    '''cut function'''
-    text_editor.event_generate(("<Cut>"))
+    text_editor.event_generate("<<Cut>>")
 
-editing_frame = Frame(root)
-editing_frame.pack(fill='both', expand=1)
+def get_paste():
+    text_editor.event_generate("<<Paste>>")
 
-labelFrame=Frame(root)
-labelFrame.pack(side='bottom')
+def get_select_all():
+    text_editor.event_generate("<<SelectAll>>")
 
-mainMenu = Menu(root)
-root.config(menu=mainMenu)
+# GUI Components
+text_editor = Text(root, wrap='word', undo=True)
+scrollbar = ttk.Scrollbar(root, orient="vertical", command=text_editor.yview)
 
-text_editor=Text(editing_frame, padx=3, pady=2, 
-                        wrap='none', maxundo=10,
-                        undo=True, blockcursor=True, autoseparators=True)
-text_editor.pack(anchor='nw', fill='both', expand='1', padx=1, pady=2)
+# Attach scrollbar to text widget
+text_editor.config(yscrollcommand=scrollbar.set)
 
-yscrollbar = ttk.Scrollbar(text_editor, orient='vertical',
-                            cursor='arrow', command=text_editor.yview,)
-yscrollbar.pack(side='right', fill='y')
+# Use grid for better placement
+text_editor.grid(row=0, column=0, sticky="nsew")
+scrollbar.grid(row=0, column=1, sticky="ns")
 
-xscrollbar = ttk.Scrollbar(text_editor, orient='horizontal',
-                           cursor='arrow', command=text_editor.xview)
-xscrollbar.pack(side='bottom', fill='x')
+# Configure root window grid to allow resizing
+root.grid_rowconfigure(0, weight=1)
+root.grid_columnconfigure(0, weight=1)
 
-#  communicate back to the scrollbar
-text_editor['yscrollcommand'] = yscrollbar.set
-text_editor['xscrollcommand'] = xscrollbar.set
-
-# text_editor.config( background='red',
-#                     yscrollcommand=yscrollbar.set, 
-#                     state='normal', 
-#                     xscrollcommand=xscrollbar.set,
-#                     tabstyle='tabular',
-#                     undo=True, 
-#                     endline=5
-#                     )
-
-lb=Label(labelFrame, text='REALTEXT')
-lb.pack(side='right', expand=1)
+# bind the select all functionality
+root.bind("<Control-a>", lambda event: get_select_all())
+root.bind("<Control-A>", lambda event: get_select_all())
 
 
+main_menu = RealMenu(root)
 
-if __name__=='__main__':
-    RealMenu(mainMenu)
-    root.bind('<Control-s>',get_save_file)
-    root.bind('<Control-S>',get_save_file)
-    root.bind('<Control-x>',get_exit_file)
-    root.bind('<Control-X>',get_exit_file)
+if __name__ == '__main__':
     root.mainloop()
